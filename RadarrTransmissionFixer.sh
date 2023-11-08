@@ -3,7 +3,9 @@
 # A simple script for Radarr to run on download completion
 
 # VARIABLES
-REMOTE="transmission-remote -n USER:PASSWD" #Change USER and PASSWD
+TRANSMISSION_URL="http://your_transmission_daemon:port/transmission/rpc" # Change this to your Transmission RPC URL
+TRANSMISSION_USER="user" # Transmission username if authentication is enabled
+TRANSMISSION_PASSWORD="password" # Transmission password if authentication is enabled
 
 ENABLE_RADARR_REFRESH=0 # set 1 if you want radarr to refresh the movie
 ENABLE_PLEX_TRASH=0  # set 1 if you want the script to clear plex trash
@@ -42,9 +44,20 @@ printferr "Processing event type: $EVENTTYPE"
 if [ -e "$STORED_FILE" ]; then
     printferr "Processing new download: ${radarr_movie_title}"
 
-    # Remove the torrent from Transmission
-    $REMOTE -t "$TORRENT_ID" --remove
-    printferr "Torrent ID: $TORRENT_ID removed from Transmission"
+    # Get the session ID
+    SESSION_ID=$(curl -si $TRANSMISSION_URL | grep -oP 'X-Transmission-Session-Id: \K.*')
+
+    # Remove the torrent from Transmission using the RPC API
+    REMOVE_RESPONSE=$(curl -s -u $TRANSMISSION_USER:$TRANSMISSION_PASSWORD --header "X-Transmission-Session-Id: $SESSION_ID" \
+                      --data '{"method":"torrent-remove","arguments":{"ids":['"$TORRENT_ID"'],"delete-local-data":true}}' \
+                      $TRANSMISSION_URL)
+
+    # Check for successful removal
+    if [[ $REMOVE_RESPONSE == *"success"* ]]; then
+        printferr "Torrent ID: $TORRENT_ID removed from Transmission"
+    else
+        printferr "Failed to remove Torrent ID: $TORRENT_ID from Transmission. Response: $REMOVE_RESPONSE"
+    fi
 
     # Delete the original file
     if [ -e "$ORIGIN_FILE" ]; then
