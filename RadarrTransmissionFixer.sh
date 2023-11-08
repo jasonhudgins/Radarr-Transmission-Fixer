@@ -82,9 +82,9 @@ if [ -e "$STORED_FILE" ]; then
         fi
     fi
     
-    #REMOTE -t TorrentID --find /New/Torrent/Data/Location
-    $REMOTE -t "$TORRENT_ID" --find "$DEST"
-    printf '%s | INFO  | Torrent ID: %s, data now in: %s\n' "$DT" "$TORRENT_ID" "$DEST" >> "$LOG"
+    # remove the torrent
+    $REMOTE -t "$TORRENT_ID" --remove
+    printf '%s | INFO  | Torrent ID: %s removed from transmission\n' "$DT" "$TORRENT_ID" >> "$LOG"
 
     if [ -e "$ORIGIN_FILE" ]; then
         rm -f "$ORIGIN_FILE"
