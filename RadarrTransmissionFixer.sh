@@ -37,11 +37,29 @@ printferr() { echo "$@" >&2; }
 if [[ "$EVENTTYPE" == "Test" ]]; then
     printferr "Connection Test Successful"
     exit 0
+else
+    printferr '%s | INFO  | Radarr Event - %s\n' "$DT" "$EVENTTYPE" 
+    printferr "Processing $TITLE | ${radarr_movie_year}"
 fi
+
+# Loop over each environment variable
+for var in $(compgen -e); do
+    # Print the environment variable and its value
+    printferr "$var=${!var}"
+done
+
+# this is all we are doing for now, we want to verify / test the existence
+# all our environment variables
+exit(0)
+
 
 printferr "Processing event type: $EVENTTYPE"
 
 if [ -e "$STORED_FILE" ]; then
+    printferr "$DT | INFO  | Processing new download of: $TITLE"
+    printferr "$DT | INFO  | Torrent ID: $TORRENT_ID | Torrent Name: $TORRENT_NAME"
+    printferr "$DT | INFO  | Movie file detected as: $SPATH"
+
     printferr "Processing new download: ${radarr_movie_title}"
 
     # Get the session ID
