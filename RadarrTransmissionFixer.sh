@@ -24,9 +24,14 @@ RADARR_PORT="7878"
 
 # Torrent details
 TORRENT_ID="${radarr_download_id}"
+
+# this is the ultimate destination of the file
 STORED_FILE="${radarr_moviefile_path}"
-ORIGIN_FILE="${radarr_moviefile_sourcepath}"
-SOURCEDIR="${radarr_moviefile_sourcefolder}"
+# this is the destination of the file as it was downloaded
+ORIGIN_FILE="${radarr_sourcepath}"
+# Use dirname to get the directory path
+SOURCEDIR=$(dirname "$radarr_sourcepath")
+# this is torrent id
 MOVIE_ID="${radarr_movie_id}"
 
 printferr() { echo "$@" >&2; }
