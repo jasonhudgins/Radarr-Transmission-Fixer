@@ -57,17 +57,13 @@ printferr "MOVIE_ID: $MOVIE_ID"
 TITLE="${radarr_movie_title}"
 printferr "TITLE: $TITLE"
 
-
-# define printferr routine
-printferr() { echo "$@" >&2; }
-
 # announce start
 printferr "Processing $TITLE | ${radarr_movie_year}"
 
 # make sure the file exists
 if [ -e "$ORIGIN_FILE" ]; then
     printferr "$DT | INFO  | Processing new download of: $TITLE"
-    printferr "$DT | INFO  | Torrent ID: $TORRENT_ID | Torrent Name: $TORRENT_NAME"
+    printferr "$DT | INFO  | Torrent ID: $TORRENT_ID | Torrent Name: $TORRENT_TITLE"
 
     printferr "Processing new download: $TITLE"
 
