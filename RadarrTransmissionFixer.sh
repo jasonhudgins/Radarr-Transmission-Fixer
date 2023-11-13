@@ -22,9 +22,6 @@ RADARR_PORT="7878"
 
 # DONT CHANGE BELOW THIS LINE
 
-# Event type
-EVENTTYPE="${radarr_eventtype}"
-
 # Torrent details
 TORRENT_ID="${radarr_download_id}"
 STORED_FILE="${radarr_moviefile_path}"
@@ -34,26 +31,7 @@ MOVIE_ID="${radarr_movie_id}"
 
 printferr() { echo "$@" >&2; }
 
-if [[ "$EVENTTYPE" == "Test" ]]; then
-    printferr "Connection Test Successful"
-    exit 0
-else
-    printferr '%s | INFO  | Radarr Event - %s\n' "$DT" "$EVENTTYPE" 
-    printferr "Processing $TITLE | ${radarr_movie_year}"
-fi
-
-# Loop over each environment variable
-for var in $(compgen -e); do
-    # Print the environment variable and its value
-    printferr "$var=${!var}"
-done
-
-# this is all we are doing for now, we want to verify / test the existence
-# all our environment variables
-exit(0)
-
-
-printferr "Processing event type: $EVENTTYPE"
+printferr "Processing $TITLE | ${radarr_movie_year}"
 
 if [ -e "$STORED_FILE" ]; then
     printferr "$DT | INFO  | Processing new download of: $TITLE"
