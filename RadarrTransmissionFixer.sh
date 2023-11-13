@@ -78,17 +78,29 @@ if [ -e "$ORIGIN_FILE" ]; then
     # Get the session ID
     SESSION_ID=$(curl -si $TRANSMISSION_URL | grep -o 'X-Transmission-Session-Id: .*' | awk '{print $2}')
 
+
+    # Debugging output for SESSION_ID
+    printferr "SESSION_ID: $SESSION_ID"
+
+    # Debugging output for MOVIE_ID
+    printferr "MOVIE_ID: $MOVIE_ID"
+
     # Remove the torrent from Transmission using the RPC API
-    REMOVE_RESPONSE=$(curl -s -u $TRANSMISSION_USER:$TRANSMISSION_PASSWORD --header "X-Transmission-Session-Id: $SESSION_ID" \
-                      --data '{"method":"torrent-remove","arguments":{"ids":['"$TORRENT_ID"'],"delete-local-data":true}}' \
-                      $TRANSMISSION_URL)
+    REMOVE_RESPONSE=$(curl -s -u "$TRANSMISSION_USER:$TRANSMISSION_PASSWORD" \
+                      --header "X-Transmission-Session-Id: $SESSION_ID" \
+                      --data '{"method":"torrent-remove","arguments":{"ids":['"$MOVIE_ID"'],"delete-local-data":true}}' \
+                      "$TRANSMISSION_URL")
+
+    # Debugging output for REMOVE_RESPONSE
+    printferr "REMOVE_RESPONSE: $REMOVE_RESPONSE"
 
     # Check for successful removal
     if [[ $REMOVE_RESPONSE == *"success"* ]]; then
-        printferr "Torrent ID: $TORRENT_ID removed from Transmission"
+        printferr "Torrent ID: $MOVIE_ID removed from Transmission"
     else
-        printferr "Failed to remove Torrent ID: $TORRENT_ID from Transmission. Response: $REMOVE_RESPONSE"
+        printferr "Failed to remove Torrent ID: $MOVIE_ID from Transmission. Response: $REMOVE_RESPONSE"
     fi
+
 else
     printferr "Downloaded file not found: $ORIGIN_FILE"
 fi
