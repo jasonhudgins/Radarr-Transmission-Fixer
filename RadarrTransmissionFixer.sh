@@ -22,29 +22,63 @@ RADARR_PORT="7878"
 
 # DONT CHANGE BELOW THIS LINE
 
-# Torrent details
-TORRENT_ID="${radarr_download_id}"
-
-# this is the ultimate destination of the file
-STORED_FILE="${radarr_moviefile_path}"
-# this is the destination of the file as it was downloaded
-ORIGIN_FILE="${radarr_sourcepath}"
-# Use dirname to get the directory path
-SOURCEDIR=$(dirname "$radarr_sourcepath")
-# this is torrent id
-MOVIE_ID="${radarr_movie_id}"
+# date and time
+DT=$(date '+%Y-%m-%d %H:%M:%S')
 
 printferr() { echo "$@" >&2; }
 
+# Torrent details
+TORRENT_ID="${radarr_download_id}"
+printferr "TORRENT_ID: $TORRENT_ID"
+
+# Torrent title
+TORRENT_TITLE="${radarr_moviefile_scenename}"
+
+# relative path of the target directory
+SPATH="${radarr_moviefile_relativepath}"
+
+# this is the ultimate destination of the file
+STORED_FILE="${radarr_moviefile_path}"
+printferr "STORED_FILE: $STORED_FILE"
+
+# this is the destination of the file as it was downloaded
+ORIGIN_FILE="${radarr_sourcepath}"
+printferr "ORIGIN_FILE: $ORIGIN_FILE"
+
+# Use dirname to get the directory path
+SOURCEDIR=$(dirname "$radarr_sourcepath")
+printferr "SOURCEDIR: $SOURCEDIR"
+
+# this is torrent id within transmission
+MOVIE_ID="${radarr_movie_id}"
+printferr "MOVIE_ID: $MOVIE_ID"
+
+# movie title
+TITLE="${radarr_movie_title}"
+printferr "TITLE: $TITLE"
+
+
+# define printferr routine
+printferr() { echo "$@" >&2; }
+
+# announce start
 printferr "Processing $TITLE | ${radarr_movie_year}"
 
-if [ -e "$STORED_FILE" ]; then
+# make sure the file exists
+if [ -e "$ORIGIN_FILE" ]; then
     printferr "$DT | INFO  | Processing new download of: $TITLE"
     printferr "$DT | INFO  | Torrent ID: $TORRENT_ID | Torrent Name: $TORRENT_NAME"
-    printferr "$DT | INFO  | Movie file detected as: $SPATH"
 
-    printferr "Processing new download: ${radarr_movie_title}"
+    printferr "Processing new download: $TITLE"
 
+    # Step 1, copy original to the final destination and rename
+    printferr "Copying $ORIGIN_FILE to $STORED_FILE"
+    # Ensure the destination directory exists
+    mkdir -p "$(dirname "$STORED_FILE")"
+    # Copy the file
+    cp "$ORIGIN_FILE" "$STORED_FILE"
+
+    # Step 2, remove the torrent from Transmission
     # Get the session ID
     SESSION_ID=$(curl -si $TRANSMISSION_URL | grep -oP 'X-Transmission-Session-Id: \K.*')
 
@@ -59,23 +93,8 @@ if [ -e "$STORED_FILE" ]; then
     else
         printferr "Failed to remove Torrent ID: $TORRENT_ID from Transmission. Response: $REMOVE_RESPONSE"
     fi
-
-    # Delete the original file
-    if [ -e "$ORIGIN_FILE" ]; then
-        rm -f "$ORIGIN_FILE"
-        printferr "Deleted original file: $ORIGIN_FILE"
-        
-        # Check and remove source directory if empty
-        if [ "$(ls -A "$SOURCEDIR")" ]; then
-            printferr "Source directory $SOURCEDIR is not empty. Skipping removal."
-        else
-            rmdir "$SOURCEDIR" && printferr "Removed empty source directory: $SOURCEDIR"
-        fi
-    else
-        printferr "Original file not found: $ORIGIN_FILE"
-    fi
 else
-    printferr "Stored file not found: $STORED_FILE"
+    printferr "Downloaded file not found: $ORIGIN_FILE"
 fi
 
 # Plex trash cleanup
