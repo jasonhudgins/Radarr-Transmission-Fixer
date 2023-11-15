@@ -49,7 +49,7 @@ printferr "ORIGIN_FILE: $ORIGIN_FILE"
 SOURCEDIR=$(dirname "$radarr_sourcepath")
 printferr "SOURCEDIR: $SOURCEDIR"
 
-# this is torrent id within transmission
+# this internal radarr id (it's not the transmissino id)
 MOVIE_ID="${radarr_movie_id}"
 printferr "MOVIE_ID: $MOVIE_ID"
 
@@ -82,13 +82,10 @@ if [ -e "$ORIGIN_FILE" ]; then
     # Debugging output for SESSION_ID
     printferr "SESSION_ID: $SESSION_ID"
 
-    # Debugging output for MOVIE_ID
-    printferr "MOVIE_ID: $MOVIE_ID"
-
     # Remove the torrent from Transmission using the RPC API
     REMOVE_RESPONSE=$(curl -s -u "$TRANSMISSION_USER:$TRANSMISSION_PASSWORD" \
                       --header "X-Transmission-Session-Id: $SESSION_ID" \
-                      --data '{"method":"torrent-remove","arguments":{"ids":['"$MOVIE_ID"'],"delete-local-data":true}}' \
+                      --data '{"method":"torrent-remove","arguments":{"ids":['"$TORRENT_ID"'],"delete-local-data":true}}' \
                       "$TRANSMISSION_URL")
 
     # Debugging output for REMOVE_RESPONSE
@@ -96,9 +93,9 @@ if [ -e "$ORIGIN_FILE" ]; then
 
     # Check for successful removal
     if [[ $REMOVE_RESPONSE == *"success"* ]]; then
-        printferr "Torrent ID: $MOVIE_ID removed from Transmission"
+        printferr "Torrent ID: $TORRENT_ID removed from Transmission"
     else
-        printferr "Failed to remove Torrent ID: $MOVIE_ID from Transmission. Response: $REMOVE_RESPONSE"
+        printferr "Failed to remove Torrent ID: $TORRENT_ID from Transmission. Response: $REMOVE_RESPONSE"
     fi
 
 else
