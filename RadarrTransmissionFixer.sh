@@ -76,8 +76,8 @@ if [ -e "$ORIGIN_FILE" ]; then
 
     # Step 2, remove the torrent from Transmission
     # Get the session ID
-    SESSION_ID=$(curl -si $TRANSMISSION_URL | grep -o 'X-Transmission-Session-Id: .*' | awk '{print $2}')
-
+    SESSION_ID_RESPONSE=$(curl -si -u "$TRANSMISSION_USER:$TRANSMISSION_PASSWORD" "$TRANSMISSION_URL/session")
+    SESSION_ID=$(echo "$SESSION_ID_RESPONSE" | sed -n 's/^X-Transmission-Session-Id: \(.*\)/\1/p' | tr -d '\r')
 
     # Debugging output for SESSION_ID
     printferr "SESSION_ID: $SESSION_ID"
