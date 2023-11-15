@@ -85,7 +85,7 @@ if [ -e "$ORIGIN_FILE" ]; then
     # Remove the torrent from Transmission using the RPC API
     REMOVE_RESPONSE=$(curl -s -u "$TRANSMISSION_USER:$TRANSMISSION_PASSWORD" \
                       --header "X-Transmission-Session-Id: $SESSION_ID" \
-                      --data '{"method":"torrent-remove","arguments":{"ids":['"$TORRENT_ID"'],"delete-local-data":true}}' \
+                      --data '{"method":"torrent-remove","arguments":{"ids":['\"$TORRENT_ID\"'],"delete-local-data":true}}' \
                       "$TRANSMISSION_URL")
 
     # Debugging output for REMOVE_RESPONSE
