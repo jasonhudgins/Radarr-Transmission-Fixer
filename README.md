@@ -1,6 +1,6 @@
 (Docker Friendly) Radarr Transmission Fixer
 ======
-**Mofified version of Cr4zyy's original script to work better in dockerized environments.  The principle difference is that it uses curl to send RPC/API commands to transmission which removes the dependency on having the transmission-remote CLI installed.  It also logs to STDERR instead of log file so you can view the output using docker logs.
+A modified version of Cr4zyy's original script to work better in dockerized environments.  The principle difference is that it uses curl to send RPC/API commands to transmission which removes the dependency on having the transmission-remote CLI installed.  It also logs to STDERR instead of log file so you can view the output using docker logs.
 
 ## Setup
 
